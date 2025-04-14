@@ -57,3 +57,14 @@ BEGIN
 END$$
 
 DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE USERNAME_TO_LOWER()
+BEGIN
+    -- Met à jour tous les noms dans la table players pour les convertir en minuscules
+    UPDATE players
+    SET nom = LOWER(nom);
+END$$
+
+DELIMITER ;
