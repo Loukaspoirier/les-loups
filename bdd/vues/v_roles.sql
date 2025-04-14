@@ -1,0 +1,2 @@
+CREATE VIEW v_roles AS
+SELECT * FROM roles;
