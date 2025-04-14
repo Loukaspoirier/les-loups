@@ -1,8 +1,3 @@
-
-
-
-
-
 CREATE VIEW ALL_PLAYERS_ELAPSED_TOUR AS
 SELECT
     p.nom AS nom_joueur,
@@ -10,7 +5,7 @@ SELECT
     t.numero AS numero_tour,
     t.date_heure AS debut_tour,
     dp.date_heure AS prise_decision,
-    TIMESTAMPDIFF(SECOND, t.date_heure, dp.date_heure) AS temps_prise_decision
+    TIMESTAMPDIFF(SECOND, t.date_heure, dp.date_heure) AS secondes_passées_dans_tour
 FROM
     players p
 JOIN
