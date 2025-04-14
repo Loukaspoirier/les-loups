@@ -57,5 +57,37 @@ def lister_parties():
     parties = moteur.lister_parties()
     return jsonify(parties)
 
+@app.route("/move", methods=["POST"])
+def deplacer_joueur():
+    data = request.json
+    id_partie = data.get("id_partie")
+    id_joueur = data.get("id_joueur")
+    direction = data.get("direction")  # Format: "01" (ligne, colonne)
+
+    if not all([id_partie, id_joueur, direction]):
+        return jsonify({"status": "KO", "erreur": "Paramètres manquants"}), 400
+
+    try:
+        # Simulation du mouvement (à remplacer par gRPC plus tard)
+        mouvement_valide = True  # Temporaire - toujours valide pour le test
+        nouvelle_position = {"row": 0, "col": 0}  # À remplacer par la vraie logique
+        
+        if mouvement_valide:
+            return jsonify({
+                "status": "OK",
+                "response": {
+                    "round_in_progress": 1,  # Numéro du tour
+                    "move": {
+                        "next_position": nouvelle_position
+                    }
+                }
+            })
+        else:
+            return jsonify({"status": "KO", "erreur": "Mouvement invalide"}), 400
+
+    except Exception as e:
+        return jsonify({"status": "KO", "erreur": str(e)}), 500
+
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)

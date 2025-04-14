@@ -38,3 +38,15 @@ def lister_parties_api():
         return response.json()
     except Exception as e:
         return {"erreur": str(e)}
+    
+def deplacer_api(id_partie, id_joueur, direction):
+    data = {
+        "id_partie": id_partie,
+        "id_joueur": id_joueur,
+        "direction": direction
+    }
+    try:
+        response = requests.post(f"{BASE_URL}/move", json=data)
+        return response.json()
+    except Exception as e:
+        return {"status": "KO", "erreur": str(e)}
