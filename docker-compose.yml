@@ -1,0 +1,16 @@
+services:
+  serveur:
+    build:
+      context: "./Serveur HTTP"
+    container_name: serveur-http
+    ports:
+      - "5000:5000"
+
+  client:
+    build:
+      context: "./Client HTTP"
+    container_name: client-http
+    depends_on:
+      - serveur
+    stdin_open: true
+    tty: true
