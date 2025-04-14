@@ -5,9 +5,10 @@ services:
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: mydb
+      POSTGRES_DB: les-loups
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - ./wv_schema.sql:/docker-entrypoint-initdb.d/wv_schema.sql
+
     ports:
       - "5432:5432"
     networks:

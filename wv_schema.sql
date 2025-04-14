@@ -1,6 +1,6 @@
-create table parties (
-    id_party int,
-    title_party text,
+CREATE TABLE parties (
+    id_party int NOT NULL PRIMARY KEY,
+    title_party text
 );
 
 create table roles_quotas (
@@ -12,23 +12,23 @@ create table roles_quotas (
 
 create table obstacles (
     id_party int,
-    id_obstacle int,
+    id_obstacle int NOT NULL PRIMARY KEY,
     position_col text,
     position_row text
 );
 
 create table roles (
-    id_role int,
+    id_role int NOT NULL PRIMARY KEY,
     description_role text
 );
 
 create table players (
-    id_player int,
+    id_player int NOT NULL PRIMARY KEY,
     pseudo text
 );
 
 create table players_in_parties (
-    id_players_in_parties int,
+    id_players_in_parties int NOT NULL PRIMARY KEY,
     id_party int,
     id_player int,
     id_role int,
@@ -36,7 +36,7 @@ create table players_in_parties (
 );
 
 create table turns (
-    id_turn int,
+    id_turn int NOT NULL PRIMARY KEY,
     id_party int,
     start_time timestamp,
     end_time timestamp
