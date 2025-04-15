@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package grpc;
+
+service GameEngine {
+  rpc RegisterPlayer (RegisterPlayerRequest) returns (RegisterPlayerResponse);
+  rpc MovePlayer (MovePlayerRequest) returns (MovePlayerResponse);
+}
+
+message RegisterPlayerRequest {
+  string pseudo = 1;
+  int32 party_id = 2;
+}
+
+message RegisterPlayerResponse {
+  string message = 1;
+  int32 player_id = 2;
+}
+
+message MovePlayerRequest {
+  int32 player_id = 1;
+  string origin_position_col = 2;
+  string origin_position_row = 3;
+  string target_position_col = 4;
+  string target_position_row = 5;
+}
+
+message MovePlayerResponse {
+  string message = 1;
+}
