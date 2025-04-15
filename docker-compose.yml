@@ -7,7 +7,8 @@ services:
       POSTGRES_PASSWORD: password
       POSTGRES_DB: les-loups
     volumes:
-      - ./wv_schema.sql:/docker-entrypoint-initdb.d/wv_schema.sql
+      - ./wv_views.sql:/docker-entrypoint-initdb.d/1_wv_schema.sql
+      - ./wv_index.sql:/docker-entrypoint-initdb.d/2_wv_index.sql
 
     ports:
       - "5432:5432"
@@ -20,6 +21,7 @@ services:
       - db
     networks:
       - app-network
+    
 
   jeu:
     build: ./moteur-jeu

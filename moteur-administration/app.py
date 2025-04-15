@@ -1,23 +1,25 @@
 import psycopg2
-from function import *
-conn = psycopg2.connect(
+from fastapi import FastAPI
+
+app = FastAPI()
+
+
+def get_conn():
+    return psycopg2.connect(
     dbname="les-loups",
     user="user",
     password="password",
-    host="db",  # c'est le nom du service PostgreSQL dans le docker-compose
+    host="db",
     port="5432"
 )
 
-try :
+
+@app.get("/insert")
+def insert():
+    conn = get_conn()
     cur = conn.cursor()
-    
-    cur.execute("SELECT version();")
-    print("Connected successfully.")
-except Exception as e:
-    print("caca:", e)
-
-
-print("PostgreSQL version:", cur.fetchone())
-print('caca')
-cur.close()
-conn.close()
+    cur.execute("INSERT INTO public.players (pseudo) VALUES (%s);", ("Rebecca",))
+    conn.commit()
+    cur.close()
+    conn.close()
+    return {"message": "Insertion OK"}

@@ -2,6 +2,6 @@ FROM python:3.11
 
 WORKDIR /app
 COPY . .
-RUN pip install psycopg2-binary
-
-CMD ["python", "app.py"]
+RUN pip install -r requirements.txt
+RUN echo "hello"
+RUN python app.py 
