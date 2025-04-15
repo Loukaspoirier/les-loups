@@ -1,0 +1,33 @@
+services:
+   db:
+     image: postgres:16
+     container_name: postgres_db
+     environment:
+       POSTGRES_USER: user
+       POSTGRES_PASSWORD: password
+       POSTGRES_DB: les-loups
+     volumes:
+       - ./01_wv_schemas.sql:/docker-entrypoint-initdb.d/01_wv_schemas.sql
+       - ./02_wv_index.sql:/docker-entrypoint-initdb.d/02_wv_index.sql
+       - ./bdd/functions/wv_funcs.sql:/docker-entrypoint-initdb.d/wv_funcs.sql
+       - ./bdd/procedures/wv_procs.sql:/docker-entrypoint-initdb.d/wv_procs.sql
+       - ./bdd/triggers/wv_triggers.sql:/docker-entrypoint-initdb.d/wv_triggers.sql
+       - ./bdd/views/wv_views.sql:/docker-entrypoint-initdb.d/wv_views.sql
+     ports:
+       - "5432:5432"
+     
+ 
+   administration:
+     build: ./moteur-administration
+     depends_on:
+       - db
+       
+   serveur-tcp:
+     build: ./TCP/Serveur TCP
+     ports:
+       - "5555:5555"
+ 
+   serveur-http:
+     build: ./HTTP/Serveur HTTP
+     ports:
+       - "5000:5000"
