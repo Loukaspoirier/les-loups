@@ -1,26 +1,25 @@
-DELIMITER $$
+CREATE OR REPLACE FUNCTION after_tour_completed()
+RETURNS trigger AS $$
+BEGIN
+    IF NEW.statut = 'completed' AND OLD.statut IS DISTINCT FROM 'completed' THEN
+        PERFORM complete_tour(NEW.id_turn, NEW.id_party);
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
 
 CREATE TRIGGER after_tour_completed
 AFTER UPDATE ON turns
 FOR EACH ROW
+EXECUTE FUNCTION trg_after_tour_completed();
+
+
+CREATE OR REPLACE FUNCTION trg_after_player_signup()
+RETURNS trigger AS $$
 BEGIN
-    -- Vérifie si le statut du tour a été mis à "completed"
-    IF NEW.statut = 'completed' AND OLD.statut != 'completed' THEN
-        -- Appel de la procédure COMPLETE_TOUR pour appliquer les demandes de déplacement et résoudre les conflits
-        CALL COMPLETE_TOUR(NEW.id_turn, NEW.id_party);
-    END IF;
-END$$
-
-DELIMITER ;
-
-DELIMITER $$
-
-CREATE TRIGGER after_player_signup
-AFTER INSERT ON players
-FOR EACH ROW
-BEGIN
-    -- Appel de la procédure USERNAME_TO_LOWER pour mettre le nom du joueur en minuscules
-    CALL USERNAME_TO_LOWER();
-END$$
-
-DELIMITER ;
+    UPDATE players
+    SET nom = LOWER(NEW.nom)
+    WHERE id_player = NEW.id_player;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;

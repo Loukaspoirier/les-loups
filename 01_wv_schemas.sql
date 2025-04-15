@@ -53,5 +53,3 @@ create table players_play (
     target_position_col text,
     target_position_row text
 );
-
-

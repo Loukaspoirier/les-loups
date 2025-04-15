@@ -7,5 +7,7 @@ COPY requirements.txt .
 RUN pip install -r requirements.txt
 
 COPY app2.py .
+copy admin_console.py .
 
 CMD ["python", "app2.py"]
+CMD ["python", "admin_console.py"]

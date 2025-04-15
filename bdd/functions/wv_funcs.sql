@@ -1,109 +1,115 @@
-DELIMITER $$
-
-CREATE FUNCTION random_position(party_id INT) 
-RETURNS POINT
-DETERMINISTIC
+-- Fonction 1 : Génération d'une position aléatoire
+CREATE OR REPLACE FUNCTION random_position(party_id INT, max_x INT, max_y INT)
+RETURNS TABLE (position_col TEXT, position_row TEXT) AS $$
+DECLARE
+    try_col TEXT;
+    try_row TEXT;
+    tries INT := 0;
 BEGIN
-    DECLARE pos POINT;
-    DECLARE max_x INT;
-    DECLARE max_y INT;
-
-    -- Détermine les dimensions de la grille de la partie
-    SELECT max_x, max_y INTO max_x, max_y
-    FROM parties
-    WHERE id_party = party_id;
-
-    -- Génère une position aléatoire qui n'a pas encore été choisie
     LOOP
-        SET pos = POINT(RAND() * max_x, RAND() * max_y);
-        -- Vérifie que la position n'a pas déjà été choisie
+        try_col := FLOOR(random() * max_x)::INT::TEXT;
+        try_row := FLOOR(random() * max_y)::INT::TEXT;
+
         IF NOT EXISTS (
-            SELECT 1 FROM players_in_parties pip
-            WHERE pip.id_party = party_id AND ST_Equals(pip.position, pos)
+            SELECT 1
+            FROM players_in_parties
+            WHERE id_party = party_id
+              AND position_col = try_col
+              AND position_row = try_row
         ) THEN
-            RETURN pos;
+            RETURN QUERY SELECT try_col, try_row;
+            EXIT;
+        END IF;
+
+        tries := tries + 1;
+        IF tries > 100 THEN
+            RAISE EXCEPTION 'Trop de tentatives de génération de position unique';
         END IF;
     END LOOP;
+END;
+$$ LANGUAGE plpgsql;
 
-END$$
 
-DELIMITER ;
-
-DELIMITER $$
-
-CREATE FUNCTION random_role(party_id INT) 
-RETURNS VARCHAR(20)
-DETERMINISTIC
+-- Fonction 2 : Attribution d'un rôle aléatoire selon les quotas
+CREATE OR REPLACE FUNCTION random_role(party_id INT)
+RETURNS TEXT AS $$
+DECLARE
+    wolf_quota INT;
+    villager_quota INT;
+    wolf_count INT;
+    selected_role TEXT;
 BEGIN
-    DECLARE role_count INT;
-    DECLARE role VARCHAR(20);
-    DECLARE wolf_quota INT;
-    DECLARE villager_quota INT;
+    SELECT min_quota::INT INTO wolf_quota
+    FROM roles_quotas rq
+    JOIN roles r ON rq.id_role = r.id_role
+    WHERE id_party = party_id AND r.description_role = 'loup';
 
-    -- Récupère les quotas de loups et de villageois pour la partie
-    SELECT loup_quota, villageois_quota INTO wolf_quota, villager_quota
-    FROM parties
-    WHERE id_party = party_id;
-
-    -- Compte le nombre de loups et de villageois déjà affectés
-    SELECT COUNT(*) INTO role_count
+    SELECT COUNT(*) INTO wolf_count
     FROM players_in_parties pip
     JOIN roles r ON pip.id_role = r.id_role
-    WHERE pip.id_party = party_id AND r.nom = 'loup';
+    WHERE pip.id_party = party_id AND r.description_role = 'loup';
 
-    IF role_count < wolf_quota THEN
-        SET role = 'loup';
+    IF wolf_count < wolf_quota THEN
+        selected_role := 'loup';
     ELSE
-        SET role = 'villageois';
+        selected_role := 'villageois';
     END IF;
 
-    RETURN role;
-END$$
+    RETURN selected_role;
+END;
+$$ LANGUAGE plpgsql;
 
-DELIMITER ;
-DELIMITER $$
 
-CREATE FUNCTION get_the_winner(party_id INT)
+-- Fonction 3 : Résumé du vainqueur d'une partie
+CREATE OR REPLACE FUNCTION get_the_winner(party_id INT)
 RETURNS TABLE (
-    nom_joueur VARCHAR(255),
-    role VARCHAR(20),
-    nom_partie VARCHAR(255),
+    nom_joueur TEXT,
+    role TEXT,
+    nom_partie TEXT,
     nb_tours_joues INT,
     nb_total_tours INT,
-    temps_moyen_prise_decision FLOAT
-)
-DETERMINISTIC
+    temps_moyen_prise_decision DOUBLE PRECISION
+) AS $$
+DECLARE
+    winner_id INT;
+    winner_role TEXT;
+    total_turns INT;
 BEGIN
-    DECLARE winner_id INT;
-    DECLARE winner_role VARCHAR(20);
-    DECLARE nb_total_tours INT;
-
-    -- Récupère l'id du vainqueur et son rôle
-    SELECT id_player, role.nom
+    -- ID et rôle du vainqueur
+    SELECT pip.id_player, r.description_role
     INTO winner_id, winner_role
     FROM parties pa
     JOIN players_in_parties pip ON pa.id_party = pip.id_party
-    JOIN roles role ON pip.id_role = role.id_role
+    JOIN roles r ON pip.id_role = r.id_role
     WHERE pa.id_party = party_id AND pa.vainqueur = pip.id_player;
 
-    -- Récupère le nombre total de tours de la partie
-    SELECT COUNT(*) INTO nb_total_tours
-    FROM turns t
-    WHERE t.id_party = party_id;
+    -- Nombre total de tours de la partie
+    SELECT COUNT(*) INTO total_turns
+    FROM turns
+    WHERE id_party = party_id;
 
-    -- Récupère les statistiques du vainqueur
+    -- Retourne les données du gagnant
     RETURN QUERY
     SELECT
-        p.nom AS nom_joueur,
-        winner_role AS role,
-        pa.nom AS nom_partie,
-        (SELECT COUNT(*) FROM turns t JOIN players_in_parties pip ON t.id_party = pip.id_party WHERE pip.id_player = winner_id) AS nb_tours_joues,
-        nb_total_tours,
-        (SELECT AVG(TIMESTAMPDIFF(SECOND, t.date_heure, dp.date_heure)) FROM turns t JOIN decision_points dp ON t.id_turn = dp.id_turn WHERE dp.id_player = winner_id) AS temps_moyen_prise_decision
-    FROM
-        players p
+        p.pseudo,
+        winner_role,
+        pa.title_party,
+        (
+            SELECT COUNT(*)
+            FROM turns t
+            JOIN players_play pp ON pp.id_turn = t.id_turn
+            JOIN players_in_parties pip ON pip.id_players_in_parties = pp.id_players_in_parties
+            WHERE t.id_party = party_id AND pip.id_player = winner_id
+        ) AS nb_tours_joues,
+        total_turns,
+        (
+            SELECT AVG(EXTRACT(EPOCH FROM (pp.end_time - pp.start_time)))
+            FROM players_play pp
+            JOIN players_in_parties pip ON pip.id_players_in_parties = pp.id_players_in_parties
+            WHERE pip.id_player = winner_id
+        ) AS temps_moyen_prise_decision
+    FROM players p
     JOIN parties pa ON p.id_player = winner_id
     WHERE pa.id_party = party_id;
-END$$
-
-DELIMITER ;
+END;
+$$ LANGUAGE plpgsql;
