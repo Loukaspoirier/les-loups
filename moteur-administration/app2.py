@@ -3,7 +3,7 @@ import os
 
 def insert_data():
     conn = psycopg2.connect(
-        host='::',
+        host='db',
         database='les-loups',
         user='user',
         password='password'
@@ -12,7 +12,7 @@ def insert_data():
     cur = conn.cursor()
     
     # Insertion d'une ligne dans la table users
-    cur.execute("INSERT INTO players (pseudo) VALUES (%s)", ("Sissi"))
+    cur.execute("INSERT INTO players (pseudo) VALUES (%s)", ("Sissi",))
     
     conn.commit()
     cur.close()

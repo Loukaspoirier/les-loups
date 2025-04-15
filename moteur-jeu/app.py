@@ -1,7 +1,7 @@
 import psycopg2
 
 conn = psycopg2.connect(
-    dbname="mydb",
+    dbname="db",
     user="user",
     password="password",
     host="db",  # c'est le nom du service PostgreSQL dans le docker-compose
