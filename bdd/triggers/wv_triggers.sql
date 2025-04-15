@@ -11,15 +11,18 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER after_tour_completed
 AFTER UPDATE ON turns
 FOR EACH ROW
-EXECUTE FUNCTION trg_after_tour_completed();
+EXECUTE FUNCTION after_tour_completed();
 
 
 CREATE OR REPLACE FUNCTION trg_after_player_signup()
 RETURNS trigger AS $$
 BEGIN
-    UPDATE players
-    SET nom = LOWER(NEW.nom)
-    WHERE id_player = NEW.id_player;
+    PERFORM username_to_lower();
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
+
+CREATE TRIGGER after_player_signup
+AFTER INSERT ON players
+FOR EACH ROW
+EXECUTE FUNCTION trg_after_player_signup();
