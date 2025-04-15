@@ -1,2 +1,0 @@
-# Exemple de fichier requirements.txt
-requests
