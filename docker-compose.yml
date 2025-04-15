@@ -1,0 +1,10 @@
+services:
+  serveur-tcp:
+    build: ./TCP/Serveur TCP
+    ports:
+      - "5555:5555"
+
+  serveur-http:
+    build: ./HTTP/Serveur HTTP
+    ports:
+      - "5000:5000"
