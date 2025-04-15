@@ -1,15 +1,5 @@
 from function import creer_partie_api, inscription_api, etat_partie_api, lister_parties_api, deplacer_api;
 
-def creer_partie():
-    print("\n=== Création d'une partie ===")
-    nb_lignes = int(input("Nombre de lignes : "))
-    nb_colonnes = int(input("Nombre de colonnes : "))
-    nb_tours = int(input("Nombre de tours max : "))
-    delai = int(input("Temps d'un tour (secondes) : "))
-    nb_obstacles = int(input("Nombre d'obstacles : "))
-    max_joueurs = int(input("Nombre maximum de joueurs : "))
-    resultat = creer_partie_api(nb_lignes, nb_colonnes, nb_tours, delai, nb_obstacles, max_joueurs)
-    print(resultat)
 
 def inscription():
     print("\n=== Inscription à une partie ===")
@@ -51,25 +41,22 @@ def deplacer():
 def menu():
     while True:
         print("\n--- Menu ---")
-        print("1. Créer une partie")
-        print("2. S'inscrire à une partie")
-        print("3. Voir l'état d'une partie")
-        print("4. Lister les parties")
-        print("5. Se déplacer")
-        print("6. Quitter")
+        print("1. S'inscrire à une partie")
+        print("2. Voir l'état d'une partie")
+        print("3. Lister les parties")
+        print("4. Se déplacer")
+        print("5. Quitter")
         choix = input("Votre choix : ")
 
         if choix == "1":
-            creer_partie()
-        elif choix == "2":
             inscription()
-        elif choix == "3":
+        elif choix == "2":
             etat_partie()
-        elif choix == "4":
+        elif choix == "3":
             lister_parties()
-        elif choix == "5":
+        elif choix == "4":
             deplacer()
-        elif choix == "6":
+        elif choix == "5":
             print("À bientôt !")
             break
         else:

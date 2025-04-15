@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import messagebox
-from function import creer_partie_api, inscription_api, lister_parties_api, etat_partie_api, deplacer_api
+from function import inscription_api, lister_parties_api, etat_partie_api, deplacer_api
 
 class ClientTkinter:
     def __init__(self, root):
@@ -11,13 +11,11 @@ class ClientTkinter:
         self.title = tk.Label(root, text="Les Loups - Interface HTTP", font=("Helvetica", 16))
         self.title.pack(pady=10)
 
-        self.btn_creer = tk.Button(root, text="Créer une partie", command=self.creer_partie)
         self.btn_inscrire = tk.Button(root, text="S'inscrire à une partie", command=self.inscription)
         self.btn_lister = tk.Button(root, text="Lister les parties", command=self.lister_parties)
         self.btn_etat = tk.Button(root, text="Voir l'état d'une partie", command=self.etat_partie)
         self.btn_deplacer = tk.Button(root, text="Se déplacer", command=self.deplacer)
         
-        self.btn_creer.pack(pady=5)
         self.btn_inscrire.pack(pady=5)
         self.btn_lister.pack(pady=5)
         self.btn_etat.pack(pady=5)
@@ -29,29 +27,6 @@ class ClientTkinter:
     def afficher(self, message):
         self.output.delete("1.0", tk.END)
         self.output.insert(tk.END, message)
-
-    def creer_partie(self):
-        win = tk.Toplevel(self.root)
-        win.title("Créer une partie")
-
-        labels = ["Lignes", "Colonnes", "Tours", "Délai (s)", "Obstacles", "Max joueurs"]
-        entries = []
-        for i, label in enumerate(labels):
-            tk.Label(win, text=label).grid(row=i, column=0)
-            entry = tk.Entry(win)
-            entry.grid(row=i, column=1)
-            entries.append(entry)
-
-        def submit():
-            try:
-                data = [int(e.get()) for e in entries]
-                resultat = creer_partie_api(*data)
-                self.afficher(str(resultat))
-                win.destroy()
-            except Exception as e:
-                messagebox.showerror("Erreur", str(e))
-
-        tk.Button(win, text="Créer", command=submit).grid(row=len(labels), columnspan=2)
 
     def inscription(self):
         win = tk.Toplevel(self.root)

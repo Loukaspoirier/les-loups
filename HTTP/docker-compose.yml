@@ -1,5 +1,0 @@
-services:
-  serveur-http:
-    build: ./Serveur HTTP
-    ports:
-      - "5000:5000"
