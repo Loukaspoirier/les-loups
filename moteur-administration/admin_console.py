@@ -1,15 +1,18 @@
 import requests
 import json
+import os
 
 def main():
     print("=== Création d'une partie ===")
-    title = input("Titre de la partie : ")
-    map_width = int(input("Largeur de la carte : "))
-    map_height = int(input("Hauteur de la carte : "))
-    nb_players = int(input("Nombre de joueurs : "))
-    max_turns = int(input("Nombre maximal de tours : "))
-    turn_duration_seconds = int(input("Durée d’un tour (en secondes) : "))
-    nb_obstacles = int(input("Nombre d’obstacles : "))
+
+    # Lecture des variables d'environnement avec valeurs par défaut
+    title = os.getenv("PARTY_TITLE", "Titre par défaut")
+    map_width = int(os.getenv("MAP_WIDTH", 10))
+    map_height = int(os.getenv("MAP_HEIGHT", 10))
+    nb_players = int(os.getenv("NB_PLAYERS", 4))
+    max_turns = int(os.getenv("MAX_TURNS", 20))
+    turn_duration_seconds = int(os.getenv("TURN_DURATION", 30))
+    nb_obstacles = int(os.getenv("NB_OBSTACLES", 5))
 
     data = {
         "title": title,
@@ -22,7 +25,7 @@ def main():
     }
 
     try:
-        response = requests.post("http://localhost:8000/create-party", json=data)
+        response = requests.post("http://localhost:5001/create-party", json=data)
         if response.status_code == 200:
             print("✅ Partie créée avec succès !")
             print(json.dumps(response.json(), indent=2))

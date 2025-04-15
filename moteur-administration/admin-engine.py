@@ -1,28 +1,3 @@
-# import psycopg2
-# import os
-
-# def insert_data():
-#     conn = psycopg2.connect(
-#         host='db',
-#         database='les-loups',
-#         user='user',
-#         password='password'
-#     )
-
-#     cur = conn.cursor()
-    
-#     # Insertion d'une ligne dans la table users
-#     cur.execute("INSERT INTO players (pseudo) VALUES (%s)", ("Sissi",))
-    
-#     conn.commit()
-#     cur.close()
-#     conn.close()
-#     print("Data inserted successfully")
-
-# if __name__ == '__main__':
-#     insert_data()
-
-
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from sqlalchemy import create_engine, Column, Integer, String, MetaData, Table
@@ -83,3 +58,20 @@ def create_party(party: PartyCreate):
         raise HTTPException(status_code=500, detail=str(e))
     finally:
         db.close()
+
+
+# flask_server.py
+from flask import Flask, jsonify
+
+app = Flask(__name__)
+
+@app.route('/players')
+def get_players():
+    return jsonify([
+        {"id": 1, "name": "Alice"},
+        {"id": 2, "name": "Bob"}
+    ])
+
+if __name__ == '__main__':
+    # Important : écouter sur 0.0.0.0 pour que ce soit accessible hors du conteneur
+    app.run(host='0.0.0.0', port=5001)
