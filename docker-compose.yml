@@ -7,32 +7,13 @@ services:
       POSTGRES_PASSWORD: password
       POSTGRES_DB: les-loups
     volumes:
-      - ./wv_views.sql:/docker-entrypoint-initdb.d/1_wv_schema.sql
-      - ./wv_index.sql:/docker-entrypoint-initdb.d/2_wv_index.sql
-
+      - ./wv_views.sql:/docker-entrypoint-initdb.d/wv_schemas.sql
     ports:
       - "5432:5432"
-    networks:
-      - app-network
+    
 
   administration:
     build: ./moteur-administration
     depends_on:
       - db
-    networks:
-      - app-network
-    
-
-  jeu:
-    build: ./moteur-jeu
-    depends_on:
-      - db
-    networks:
-      - app-network
-
-volumes:
-  pgdata:
-
-networks:
-  app-network:
-    driver: bridge
+    # command: pip install -r requirements.txt
