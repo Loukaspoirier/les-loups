@@ -1,2 +1,0 @@
-CREATE VIEW v_turns AS
-SELECT * FROM turns;

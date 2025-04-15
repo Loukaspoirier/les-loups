@@ -12,7 +12,7 @@ services:
       - ./bdd/functions/wv_funcs.sql:/docker-entrypoint-initdb.d/wv_funcs.sql
       - ./bdd/procedures/wv_procs.sql:/docker-entrypoint-initdb.d/wv_procs.sql
       - ./bdd/triggers/wv_triggers.sql:/docker-entrypoint-initdb.d/wv_triggers.sql
-      - ./bdd/view/:/docker-entrypoint-initdb.d/view
+      - ./bdd/views/wv_views.sql:/docker-entrypoint-initdb.d/wv_views.sql
     ports:
       - "5432:5432"
     

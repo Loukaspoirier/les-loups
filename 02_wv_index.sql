@@ -2,6 +2,12 @@ ALTER TABLE parties DROP COLUMN id_party;
 ALTER TABLE parties ADD COLUMN id_party SERIAL PRIMARY KEY;
 ALTER TABLE parties ADD nb_turns INT;
 ALTER TABLE parties ADD turn_duration INTERVAL;
+CREATE TABLE decision_points (
+    id_turn int,
+    id_player int,
+    date_decision timestamp
+);
+
 
 ALTER TABLE roles DROP COLUMN IF EXISTS id_role;
 ALTER TABLE roles ADD COLUMN id_role SERIAL PRIMARY KEY;
