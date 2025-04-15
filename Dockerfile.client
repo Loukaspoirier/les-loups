@@ -1,0 +1,14 @@
+# Utiliser une image Python officielle comme base
+FROM python:3.9-slim
+
+# Définir le répertoire de travail
+WORKDIR /app
+
+# Copier le fichier du client
+COPY tcp_client.py /app
+
+# Installer les dépendances
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Commande à exécuter lorsque le conteneur démarre
+CMD ["python", "tcp_client.py"]

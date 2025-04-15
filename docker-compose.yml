@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  server:
+    build:
+      context: .  # Utiliser le même dossier pour le serveur
+      dockerfile: Dockerfile.server
+    ports:
+      - "54320:54320"  # Mapper le port 54320 du serveur local au port du conteneur
+    networks:
+      - mynetwork
+
+  client:
+    build:
+      context: .  # Utiliser le même dossier pour le client
+      dockerfile: Dockerfile.client
+    depends_on:
+      - server  # Le client dépend du serveur
+    networks:
+      - mynetwork
+
+networks:
+  mynetwork:
+    driver: bridge
