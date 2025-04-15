@@ -160,40 +160,50 @@ class JeuLocal:
         self.canvas.delete("all")
         if not moteur.partie:
             return
-        
+    
         config = moteur.partie['config']
         cell_w = 500 // config['nb_colonnes']
         cell_h = 500 // config['nb_lignes']
-        
+    
+        # Police pour les emojis
+        emoji_font = ('Segoe UI Emoji', min(cell_w, cell_h) // 2)
+    
         # Récupérer les cases visibles
         plateau_visible = moteur.get_plateau_visible(moteur.partie['joueur']['position'])
-        
+    
         for i in range(config['nb_lignes']):
             for j in range(config['nb_colonnes']):
                 if plateau_visible[i][j] is not None:
-                    color = 'white'
-                    if plateau_visible[i][j] == 'obstacle':
-                        color = 'gray'
-                    elif plateau_visible[i][j] in ['loup', 'villageois']:
-                        # Dessiner le NPC
-                        self.canvas.create_rectangle(
-                            j * cell_w + 5, i * cell_h + 5,
-                            (j+1) * cell_w - 5, (i+1) * cell_h - 5,
-                            fill="red" if plateau_visible[i][j] == 'loup' else "blue"
-                        )
-                    
+                    # Dessiner le fond de la cellule
                     self.canvas.create_rectangle(
                         j * cell_w, i * cell_h,
                         (j+1) * cell_w, (i+1) * cell_h,
-                        fill=color, outline="lightgray"
+                        fill='white', outline="lightgray"
                     )
-        
+                
+                    # Dessiner le contenu de la cellule
+                    if plateau_visible[i][j] == 'obstacle':
+                        self.canvas.create_text(
+                            j * cell_w + cell_w//2, i * cell_h + cell_h//2,
+                            text="🪨", font=emoji_font
+                        )
+                    elif plateau_visible[i][j] == 'loup':
+                        self.canvas.create_text(
+                            j * cell_w + cell_w//2, i * cell_h + cell_h//2,
+                            text="🐺", font=emoji_font
+                        )
+                    elif plateau_visible[i][j] == 'villageois':
+                        self.canvas.create_text(
+                            j * cell_w + cell_w//2, i * cell_h + cell_h//2,
+                            text="👨", font=emoji_font
+                        )
+    
         # Dessiner le joueur
         j_pos = moteur.partie['joueur']['position']
-        self.canvas.create_oval(
-            j_pos[1] * cell_w + 5, j_pos[0] * cell_h + 5,
-            (j_pos[1]+1) * cell_w - 5, (j_pos[0]+1) * cell_h - 5,
-            fill="red" if moteur.partie['joueur']['role'] == 'loup' else "blue"
+        emoji_joueur = "🐺" if moteur.partie['joueur']['role'] == 'loup' else "👨"
+        self.canvas.create_text(
+            j_pos[1] * cell_w + cell_w//2, j_pos[0] * cell_h + cell_h//2,
+            text=emoji_joueur, font=emoji_font
         )
     
     def deplacer(self, direction):
